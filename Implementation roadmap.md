@@ -79,21 +79,21 @@ Transform natural language search queries and event PDF brochures into structure
 Build an autonomous link harvester and crawler that navigates the web, prioritizes high-value leadership pages, handles dead pages, and circumvents anti-scraping blocks.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 3.1: Dual Search Client (`src/search/search_client.py`)**
+- [x] **Task 3.1: Dual Search Client (`src/search/search_client.py`)**
   - Implement unified client for Tavily Search and Serper (Google Search) with automatic fallback.
   - Implement Dorking generators:
     - Corporate: `"{company} leadership team"`, `"{company} VP marketing"`, `"{company} CSR head email"`
     - College: `"{college} {society} president"`, `"{college} {society} team contact"`
-- [ ] **Task 3.2: Link Prioritization & Scoring Engine (`src/crawler/link_prioritizer.py`)**
+- [x] **Task 3.2: Link Prioritization & Scoring Engine (`src/crawler/link_prioritizer.py`)**
   - Score discovered URLs based on path keywords:
     - High priority (+10): `/team`, `/about-us`, `/leadership`, `/people`, `/executive-board`, `/council`
     - Medium priority (+5): `/contact`, `/press`, `/sponsor`, `/partners`
     - Blacklisted (-100): `/privacy-policy`, `/terms`, `/login`, `/careers`, `/cart`
-- [ ] **Task 3.3: Resilient HTML Fetcher with Dead Page Handling (`src/crawler/resilience.py`)**
+- [x] **Task 3.3: Resilient HTML Fetcher with Dead Page Handling (`src/crawler/resilience.py`)**
   - Implement async HTTP client (`httpx`) with rotating User-Agents, configurable timeouts (10s), and exponential backoff retry.
   - Implement explicit dead link handler: detects HTTP 404, 403, 500, 502, DNS NXDOMAIN, and connection timeouts.
   - When a page is dead, log the event, mark URL in `dead_urls`, and immediately trigger fallback query generation (e.g., search alternative domain or social page) without failing the run.
-- [ ] **Task 3.4: Headless Browser JS-Rendering Fallback (`src/crawler/deep_crawler.py`)**
+- [x] **Task 3.4: Headless Browser JS-Rendering Fallback (`src/crawler/deep_crawler.py`)**
   - Implement Crawl4AI / Playwright fallback for SPA websites (React, Vue, Webflow) that return empty `<div id="root">` via static requests.
   - Extract clean, readable markdown content via Trafilatura.
 
