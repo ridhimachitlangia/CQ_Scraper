@@ -10,11 +10,11 @@ This roadmap outlines the complete, sequential engineering execution plan. Each 
 Establish the repository baseline, virtual environment, dependency management, and configuration secrets.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 0.1: Virtual Environment & Dependency Isolation**
+- [x] **Task 0.1: Virtual Environment & Dependency Isolation**
   - Initialize Python 3.11+ virtual environment (`python -m venv venv`).
   - Configure `requirements.txt` with locked versions (`langgraph>=0.2.20`, `langchain-core`, `langchain-openai`, `pydantic>=2.7`, `fitz` (PyMuPDF), `pdfplumber`, `trafilatura`, `crawl4ai`, `aiosmtplib`, `dnspython`, `gspread`, `fastapi`, `uvicorn`, `httpx`, `pytest`, `python-dotenv`).
   - Install Playwright browsers (`playwright install chromium`).
-- [ ] **Task 0.2: Configuration & Environment Management (`config/settings.py`)**
+- [x] **Task 0.2: Configuration & Environment Management (`config/settings.py`)**
   - Create `.env.example` defining `OPENAI_API_KEY`, `TAVILY_API_KEY`, `SERPER_API_KEY`, `GOOGLE_SHEET_CREDENTIALS_JSON`, `GOOGLE_SPREADSHEET_ID`.
   - Implement `AppSettings` using `pydantic-settings` with strict type checking, fail-fast validations, and defaults.
 - [ ] **Task 0.3: Google Cloud & Service Account Provisioning**
@@ -29,7 +29,7 @@ Establish the repository baseline, virtual environment, dependency management, a
 Establish the immutable data contracts for the 6-field sheet output and LangGraph's state machine.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 1.1: The 6-Field Output Schema (`src/models/schema.py`)**
+- [x] **Task 1.1: The 6-Field Output Schema (`src/models/schema.py`)**
   - Define `CategoryEnum` (`"Sponsor"`, `"College Delegation"`).
   - Define `VerificationStatusEnum` (`"Verified"`, `"Pattern-Derived"`).
   - Implement `FinalLeadRecord` with aliases matching the required sheet columns:
@@ -40,9 +40,9 @@ Establish the immutable data contracts for the 6-field sheet output and LangGrap
     5. `Contact Channel` (str - valid deliverable email or live profile URL)
     6. `Verification Status` (VerificationStatusEnum)
   - Implement Pydantic validators forbidding generic role-less contacts, placeholder values ("N/A", "Unknown"), or central inboxes (`info@`, `contact@`, `admin@`).
-- [ ] **Task 1.2: Intermediate Extraction Models**
+- [x] **Task 1.2: Intermediate Extraction Models**
   - Implement `TargetOrganization`, `DecisionMakerCandidate`, `EmailPatternRule`, and `ScrapedPageSnapshot`.
-- [ ] **Task 1.3: LangGraph State Modeling (`src/models/state.py`)**
+- [x] **Task 1.3: LangGraph State Modeling (`src/models/state.py`)**
   - Define `AgentState` TypedDict with typed reducers (`operator.add` for lists) for audit logs, candidate leads, visited URLs, and dead URLs.
   - Add state flags: `retry_count`, `active_org_index`, `is_complete`.
 
