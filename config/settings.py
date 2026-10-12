@@ -11,10 +11,12 @@ load_dotenv(BASE_DIR / ".env")
 os.environ.setdefault("CRAWL4_AI_BASE_DIRECTORY", str(BASE_DIR / ".crawl4ai"))
 
 try:
-    from pydantic_settings import BaseSettings
+    from pydantic_settings import BaseSettings, SettingsConfigDict
     from pydantic import Field
 
     class Settings(BaseSettings):
+        model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
         openai_api_key: Optional[str] = Field(default=None, alias="OPENAI_API_KEY")
         anthropic_api_key: Optional[str] = Field(default=None, alias="ANTHROPIC_API_KEY")
         tavily_api_key: Optional[str] = Field(default=None, alias="TAVILY_API_KEY")
@@ -28,10 +30,6 @@ try:
         crawl_timeout_seconds: float = Field(default=12.0, alias="CRAWL_TIMEOUT_SECONDS")
         max_search_results_per_query: int = Field(default=5, alias="MAX_SEARCH_RESULTS_PER_QUERY")
         max_lead_targets: int = Field(default=15, alias="MAX_LEAD_TARGETS")
-
-        class Config:
-            env_file = ".env"
-            extra = "ignore"
 
     settings = Settings()
 

@@ -55,19 +55,19 @@ Establish the immutable data contracts for the 6-field sheet output and LangGrap
 Transform natural language search queries and event PDF brochures into structured target seeds.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 2.1: Native PDF Text & Layout Extractor (`src/parsers/brochure_parser.py`)**
-  - Implement PyMuPDF (`fitz`) and `pdfplumber` extraction to extract text blocks, tables, and metadata.
+- [x] **Task 2.1: Native PDF Text & Layout Extractor (`src/parsers/brochure_parser.py`)**
+  - Implement PyMuPDF (`fitz` / `pymupdf`) and `pdfplumber` extraction to extract text blocks, tables, and metadata.
   - Implement font-size heuristics to identify headlines, tier headers ("Title Sponsor", "Associate Sponsor", "College Chapters"), and past partners.
-- [ ] **Task 2.2: Visual OCR & Poster Image Fallback**
-  - Handle graphic-heavy PDF brochures (where text is embedded in raster images) by converting PDF pages to images using `pdf2image`.
+- [x] **Task 2.2: Visual OCR & Poster Image Fallback**
+  - Handle graphic-heavy PDF brochures (where text is embedded in raster images) by converting PDF pages to images using `pymupdf` pixmaps.
   - Pass raster pages through an OCR/Vision LLM extraction prompt to parse logos and partner mentions.
-- [ ] **Task 2.3: Entity & Target Synthesis Prompting**
+- [x] **Task 2.3: Entity & Target Synthesis Prompting**
   - Construct prompt that ingests extracted brochure text/visuals and outputs:
     1. Event Domain / Theme (e.g., Tech Hackathon, Business Conclave, Cultural Fest).
     2. Existing / Past Sponsors mentioned in the brochure.
     3. Prospecting Sectors (e.g., FinTech, Cloud Hosting, FMCG, Beverage brands).
     4. Target College Clubs / Societies (e.g., Coding Clubs, Debating Societies, E-Cells).
-- [ ] **Task 2.4: Search Prompt Intent Deconstruction (`src/parsers/prompt_expander.py`)**
+- [x] **Task 2.4: Search Prompt Intent Deconstruction (`src/parsers/prompt_expander.py`)**
   - Parse unstructured search queries (e.g., *"Find AI startup sponsors and robotics college societies in Bangalore for our hackathon"*) into structured target entities and geographic filters.
 
 ---
