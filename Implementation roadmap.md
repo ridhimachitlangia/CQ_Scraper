@@ -10,11 +10,11 @@ This roadmap outlines the complete, sequential engineering execution plan. Each 
 Establish the repository baseline, virtual environment, dependency management, and configuration secrets.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 0.1: Virtual Environment & Dependency Isolation**
+- [x] **Task 0.1: Virtual Environment & Dependency Isolation**
   - Initialize Python 3.11+ virtual environment (`python -m venv venv`).
   - Configure `requirements.txt` with locked versions (`langgraph>=0.2.20`, `langchain-core`, `langchain-openai`, `pydantic>=2.7`, `fitz` (PyMuPDF), `pdfplumber`, `trafilatura`, `crawl4ai`, `aiosmtplib`, `dnspython`, `gspread`, `fastapi`, `uvicorn`, `httpx`, `pytest`, `python-dotenv`).
   - Install Playwright browsers (`playwright install chromium`).
-- [ ] **Task 0.2: Configuration & Environment Management (`config/settings.py`)**
+- [x] **Task 0.2: Configuration & Environment Management (`config/settings.py`)**
   - Create `.env.example` defining `OPENAI_API_KEY`, `TAVILY_API_KEY`, `SERPER_API_KEY`, `GOOGLE_SHEET_CREDENTIALS_JSON`, `GOOGLE_SPREADSHEET_ID`.
   - Implement `AppSettings` using `pydantic-settings` with strict type checking, fail-fast validations, and defaults.
 - [ ] **Task 0.3: Google Cloud & Service Account Provisioning**
@@ -29,7 +29,7 @@ Establish the repository baseline, virtual environment, dependency management, a
 Establish the immutable data contracts for the 6-field sheet output and LangGraph's state machine.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 1.1: The 6-Field Output Schema (`src/models/schema.py`)**
+- [x] **Task 1.1: The 6-Field Output Schema (`src/models/schema.py`)**
   - Define `CategoryEnum` (`"Sponsor"`, `"College Delegation"`).
   - Define `VerificationStatusEnum` (`"Verified"`, `"Pattern-Derived"`).
   - Implement `FinalLeadRecord` with aliases matching the required sheet columns:
@@ -40,9 +40,9 @@ Establish the immutable data contracts for the 6-field sheet output and LangGrap
     5. `Contact Channel` (str - valid deliverable email or live profile URL)
     6. `Verification Status` (VerificationStatusEnum)
   - Implement Pydantic validators forbidding generic role-less contacts, placeholder values ("N/A", "Unknown"), or central inboxes (`info@`, `contact@`, `admin@`).
-- [ ] **Task 1.2: Intermediate Extraction Models**
+- [x] **Task 1.2: Intermediate Extraction Models**
   - Implement `TargetOrganization`, `DecisionMakerCandidate`, `EmailPatternRule`, and `ScrapedPageSnapshot`.
-- [ ] **Task 1.3: LangGraph State Modeling (`src/models/state.py`)**
+- [x] **Task 1.3: LangGraph State Modeling (`src/models/state.py`)**
   - Define `AgentState` TypedDict with typed reducers (`operator.add` for lists) for audit logs, candidate leads, visited URLs, and dead URLs.
   - Add state flags: `retry_count`, `active_org_index`, `is_complete`.
 
@@ -55,19 +55,19 @@ Establish the immutable data contracts for the 6-field sheet output and LangGrap
 Transform natural language search queries and event PDF brochures into structured target seeds.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 2.1: Native PDF Text & Layout Extractor (`src/parsers/brochure_parser.py`)**
-  - Implement PyMuPDF (`fitz`) and `pdfplumber` extraction to extract text blocks, tables, and metadata.
+- [x] **Task 2.1: Native PDF Text & Layout Extractor (`src/parsers/brochure_parser.py`)**
+  - Implement PyMuPDF (`fitz` / `pymupdf`) and `pdfplumber` extraction to extract text blocks, tables, and metadata.
   - Implement font-size heuristics to identify headlines, tier headers ("Title Sponsor", "Associate Sponsor", "College Chapters"), and past partners.
-- [ ] **Task 2.2: Visual OCR & Poster Image Fallback**
-  - Handle graphic-heavy PDF brochures (where text is embedded in raster images) by converting PDF pages to images using `pdf2image`.
+- [x] **Task 2.2: Visual OCR & Poster Image Fallback**
+  - Handle graphic-heavy PDF brochures (where text is embedded in raster images) by converting PDF pages to images using `pymupdf` pixmaps.
   - Pass raster pages through an OCR/Vision LLM extraction prompt to parse logos and partner mentions.
-- [ ] **Task 2.3: Entity & Target Synthesis Prompting**
+- [x] **Task 2.3: Entity & Target Synthesis Prompting**
   - Construct prompt that ingests extracted brochure text/visuals and outputs:
     1. Event Domain / Theme (e.g., Tech Hackathon, Business Conclave, Cultural Fest).
     2. Existing / Past Sponsors mentioned in the brochure.
     3. Prospecting Sectors (e.g., FinTech, Cloud Hosting, FMCG, Beverage brands).
     4. Target College Clubs / Societies (e.g., Coding Clubs, Debating Societies, E-Cells).
-- [ ] **Task 2.4: Search Prompt Intent Deconstruction (`src/parsers/prompt_expander.py`)**
+- [x] **Task 2.4: Search Prompt Intent Deconstruction (`src/parsers/prompt_expander.py`)**
   - Parse unstructured search queries (e.g., *"Find AI startup sponsors and robotics college societies in Bangalore for our hackathon"*) into structured target entities and geographic filters.
 
 ---
@@ -79,21 +79,21 @@ Transform natural language search queries and event PDF brochures into structure
 Build an autonomous link harvester and crawler that navigates the web, prioritizes high-value leadership pages, handles dead pages, and circumvents anti-scraping blocks.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 3.1: Dual Search Client (`src/search/search_client.py`)**
+- [x] **Task 3.1: Dual Search Client (`src/search/search_client.py`)**
   - Implement unified client for Tavily Search and Serper (Google Search) with automatic fallback.
   - Implement Dorking generators:
     - Corporate: `"{company} leadership team"`, `"{company} VP marketing"`, `"{company} CSR head email"`
     - College: `"{college} {society} president"`, `"{college} {society} team contact"`
-- [ ] **Task 3.2: Link Prioritization & Scoring Engine (`src/crawler/link_prioritizer.py`)**
+- [x] **Task 3.2: Link Prioritization & Scoring Engine (`src/crawler/link_prioritizer.py`)**
   - Score discovered URLs based on path keywords:
     - High priority (+10): `/team`, `/about-us`, `/leadership`, `/people`, `/executive-board`, `/council`
     - Medium priority (+5): `/contact`, `/press`, `/sponsor`, `/partners`
     - Blacklisted (-100): `/privacy-policy`, `/terms`, `/login`, `/careers`, `/cart`
-- [ ] **Task 3.3: Resilient HTML Fetcher with Dead Page Handling (`src/crawler/resilience.py`)**
+- [x] **Task 3.3: Resilient HTML Fetcher with Dead Page Handling (`src/crawler/resilience.py`)**
   - Implement async HTTP client (`httpx`) with rotating User-Agents, configurable timeouts (10s), and exponential backoff retry.
   - Implement explicit dead link handler: detects HTTP 404, 403, 500, 502, DNS NXDOMAIN, and connection timeouts.
   - When a page is dead, log the event, mark URL in `dead_urls`, and immediately trigger fallback query generation (e.g., search alternative domain or social page) without failing the run.
-- [ ] **Task 3.4: Headless Browser JS-Rendering Fallback (`src/crawler/deep_crawler.py`)**
+- [x] **Task 3.4: Headless Browser JS-Rendering Fallback (`src/crawler/deep_crawler.py`)**
   - Implement Crawl4AI / Playwright fallback for SPA websites (React, Vue, Webflow) that return empty `<div id="root">` via static requests.
   - Extract clean, readable markdown content via Trafilatura.
 
