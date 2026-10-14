@@ -128,13 +128,13 @@ Extract the actual individual decision-maker (name and role) and discover their 
 Verify that every extracted contact channel is genuine, exists, and is deliverable before it reaches the final output sheet.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 5.1: RFC Syntax & Typo Validation (`src/verifier/syntax_check.py`)**
+- [x] **Task 5.1: RFC Syntax & Typo Validation (`src/verifier/syntax_check.py`)**
   - Validate syntax against RFC 5321/5322 via `email-validator`.
   - Check for common domain typos (`gmial.com`, `outlok.com`).
-- [ ] **Task 5.2: DNS MX Record Resolver (`src/verifier/mx_resolver.py`)**
+- [x] **Task 5.2: DNS MX Record Resolver (`src/verifier/mx_resolver.py`)**
   - Query DNS MX records via `dnspython` with asynchronous resolver.
   - Verify that the target domain has active, reachable mail exchange servers. Discard emails with missing or null MX records.
-- [ ] **Task 5.3: Non-Intrusive SMTP Handshake & Catch-All Detection (`src/verifier/smtp_handshake.py`)**
+- [x] **Task 5.3: Non-Intrusive SMTP Handshake & Catch-All Detection (`src/verifier/smtp_handshake.py`)**
   - Connect to target MX host on port 25 with a polite HELO/EHLO identity.
   - Send `MAIL FROM:<verify@verified-leads.org>` and `RCPT TO:<candidate@domain.com>`.
   - Capture SMTP response codes (250 OK = deliverable, 550 = mailbox does not exist).
@@ -143,7 +143,7 @@ Verify that every extracted contact channel is genuine, exists, and is deliverab
     - Direct 250 OK on individual email (Non-Catch-All) $\to$ `"Verified"`.
     - Derived via pattern on Catch-All or confirmed domain $\to$ `"Pattern-Derived"`.
     - 550 / Dead $\to$ Discard completely.
-- [ ] **Task 5.4: Social Profile Liveness Verification (`src/verifier/social_validator.py`)**
+- [x] **Task 5.4: Social Profile Liveness Verification (`src/verifier/social_validator.py`)**
   - Perform async HTTP `HEAD` or `GET` request to candidate profile URLs.
   - Confirm HTTP 200 response and absence of "Profile Not Found", "Page Expired", or "Login Required" error screens.
   - Mark verified live profile links as `"Verified"`.
