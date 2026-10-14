@@ -106,14 +106,14 @@ Build an autonomous link harvester and crawler that navigates the web, prioritiz
 Extract the actual individual decision-maker (name and role) and discover their email or profile link, rejecting all generic mailboxes.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 4.1: Role-Specific Persona Extractor (`src/extractors/decision_maker.py`)**
+- [x] **Task 4.1: Role-Specific Persona Extractor (`src/extractors/decision_maker.py`)**
   - Implement structured LLM extraction prompt enforcing the hierarchy of decision-makers:
     - Sponsors: Head of Marketing, VP Marketing, Chief Marketing Officer, CSR Head, Brand Partnerships Director, Founder.
     - College Delegations: Society President, Convenor, General Secretary, Team Captain, Faculty In-Charge.
   - Strict Negative Filter: Reject general support emails (`info@`, `contact@`, `hello@`, `admin@`, `support@`, `careers@`). If only a generic email is found, discard it and mandate discovering the specific individual's LinkedIn or social profile instead.
-- [ ] **Task 4.2: Social Profile Extraction**
+- [x] **Task 4.2: Social Profile Extraction**
   - Extract authentic personal profile links: LinkedIn (`linkedin.com/in/*`), Instagram (`instagram.com/*` for college societies), Twitter/X, and official university faculty/student directory URLs.
-- [ ] **Task 4.3: Email Format Pattern Derivation Engine (`src/extractors/pattern_engine.py`)**
+- [x] **Task 4.3: Email Format Pattern Derivation Engine (`src/extractors/pattern_engine.py`)**
   - If a decision-maker's name is known (e.g., "Arun Kumar") and corporate emails for other team members are visible on the domain (e.g., "priya.nair@acme.com", "vikram.singh@acme.com"):
     - Identify the domain pattern: `{first}.{last}@{domain}`.
     - Synthesize candidate email: `arun.kumar@acme.com`.
