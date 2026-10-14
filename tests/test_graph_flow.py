@@ -244,9 +244,15 @@ class TestGraphNodes:
     async def test_sync_sheet_node(self):
         """sync_sheet_node marks state complete and reports verified row count."""
         state = create_initial_state()
-        state["verified_leads"] = [
-            {"Organization Name": "Org 1", "Contact Channel": "sarah@acme.com"}
-        ]
+        record = FinalLeadRecord(
+            organization_name="Org 1",
+            category=CategoryEnum.SPONSOR,
+            location="Bengaluru",
+            contact_person="Sarah Connor - VP Marketing",
+            contact_channel="sarah@acme.com",
+            verification_status=VerificationStatusEnum.VERIFIED,
+        )
+        state["verified_leads"] = [record.model_dump(by_alias=True)]
         res = await sync_sheet_node(state)
         assert res["is_complete"] is True
         assert res["rows_synced_count"] == 1

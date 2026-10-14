@@ -590,19 +590,75 @@ async def verify_contact_node(state: AgentState) -> dict[str, Any]:
 # ==============================================================================
 
 async def sync_sheet_node(state: AgentState) -> dict[str, Any]:
-    """Finalizes pipeline execution and summarizes the 6-field output table."""
-    verified = state.get("verified_leads", [])
-    total_count = len(verified)
+    """Finalizes pipeline execution, pushes verified rows to Google Sheets and SQLite DB."""
+    verified_raw = state.get("verified_leads", [])
+    records: list[FinalLeadRecord] = []
+    for item in verified_raw:
+        if isinstance(item, FinalLeadRecord):
+            records.append(item)
+        elif isinstance(item, dict):
+            try:
+                records.append(FinalLeadRecord.model_validate(item))
+            except Exception:
+                pass
 
-    logs = [
+    logs: list[dict[str, Any]] = []
+
+    # 1. Google Sheets Sync
+    from src.storage.google_sheets import GoogleSheetsSyncClient
+    from src.storage.database import LocalDatabase
+
+    sheet_client = GoogleSheetsSyncClient()
+    sync_res = sheet_client.sync_leads(records)
+    logs.append(
+        _create_log(
+            "sync_sheet",
+            f"Google Sheets Sync: {sync_res.rows_appended} new rows appended, {sync_res.duplicates_skipped} duplicates skipped. URL: {sync_res.spreadsheet_url}",
+        )
+    )
+
+    # 2. Local SQLite Sync
+    try:
+        db = LocalDatabase()
+        await db.init_db()
+        session_id = f"run_{datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+        await db.create_or_update_run(
+            session_id=session_id,
+            search_prompt=state.get("search_prompt"),
+            brochure_path=state.get("brochure_path"),
+            category_focus=state.get("category_focus"),
+            is_complete=True,
+            total_leads_found=len(records),
+            google_sheet_url=sync_res.spreadsheet_url,
+        )
+        if records:
+            await db.save_leads(session_id, records)
+        all_logs = state.get("audit_logs", [])
+        if all_logs:
+            await db.save_audit_logs(session_id, all_logs)
+        logs.append(
+            _create_log(
+                "sync_sheet",
+                f"Local SQLite DB: Run {session_id} and {len(records)} leads saved to database.",
+            )
+        )
+    except Exception as db_err:
+        logger.warning(f"Local SQLite sync warning: {db_err}")
+        logs.append(_create_log("sync_sheet", f"SQLite sync error: {db_err}", "WARNING"))
+
+    total_count = len(verified_raw)
+    logs.append(
         _create_log(
             "sync_sheet",
             f"Autonomous pipeline complete. Total verified 6-field leads: {total_count}",
         )
-    ]
+    )
+
+    rows_synced = sync_res.rows_appended if sync_res.rows_appended > 0 else total_count
 
     return {
         "is_complete": True,
-        "rows_synced_count": total_count,
+        "rows_synced_count": rows_synced,
+        "google_sheet_url": sync_res.spreadsheet_url,
         "audit_logs": logs,
     }
