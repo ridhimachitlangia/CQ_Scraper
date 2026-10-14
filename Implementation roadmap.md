@@ -157,14 +157,14 @@ Verify that every extracted contact channel is genuine, exists, and is deliverab
 Assemble the isolated nodes into an autonomous LangGraph `StateGraph` with conditional branches, retry limits, and dead-page recovery.
 
 #### Micro Elementary Tasks:
-- [ ] **Task 6.1: Node Implementation (`src/graph/nodes.py`)**
+- [x] **Task 6.1: Node Implementation (`src/graph/nodes.py`)**
   - Implement `parse_input_node`, `expand_targets_node`, `search_web_node`, `crawl_page_node`, `extract_decision_maker_node`, `verify_contact_node`, `sync_sheet_node`.
-- [ ] **Task 6.2: Conditional Edges & Routing (`src/graph/edges.py`)**
+- [x] **Task 6.2: Conditional Edges & Routing (`src/graph/edges.py`)**
   - `route_after_crawl`: If current URL returned 404 or dead, route to `handle_dead_link_node` (reformulates search query) without aborting.
   - `route_after_extraction`: If decision-maker not found on website, route to `social_dork_search_node`.
   - `route_after_verification`: If contact unverified, attempt fallback to authentic social profile; if none, drop lead and proceed to next organization.
   - `check_completion`: Loop until all target organizations are processed or quota reached.
-- [ ] **Task 6.3: State Graph Compilation & Checkpointing (`src/graph/lead_graph.py`)**
+- [x] **Task 6.3: State Graph Compilation & Checkpointing (`src/graph/lead_graph.py`)**
   - Compile the `StateGraph` with `MemorySaver` checkpointer for auditability, pause/resume, and replayability.
 
 ---

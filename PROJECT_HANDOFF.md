@@ -1,8 +1,8 @@
 # PROJECT HANDOFF & CONTEXT TRANSFER DOCUMENT
 **Project:** Autonomous Lead Discovery & Verification Agent (CQ Scraper)  
 **Framework:** LangGraph Multi-Agent Architecture (Python 3.11+ / 3.14)  
-**Status:** Phases 0, 1, 2, 3, 4, and 5 Fully Implemented & Verified (76/76 Tests Passing)  
-**Current Handover Point:** Ready for **Phase 6 (LangGraph State Machine Assembly & Autonomous Feedback Loops)**
+**Status:** Phases 0, 1, 2, 3, 4, 5, and 6 Fully Implemented & Verified (92/92 Tests Passing)  
+**Current Handover Point:** Ready for **Phase 7 (Hands-Free Google Sheets & Local SQLite Sync)**
 
 ---
 
@@ -16,10 +16,10 @@ Build an autonomous AI agent using **LangGraph** that takes either a natural lan
 ### 100-Point Evaluation Benchmark
 | Metric | Points | Project Implementation Status |
 | :--- | :---: | :--- |
-| **Agent Flow & Autonomy** (searches, follows links, handles dead pages) | **40** | **Phases 3 & 4 Done** (Resilient crawler, link prioritization, dead-page failover, query reformulation). Phase 6 will wire the final LangGraph state machine. |
+| **Agent Flow & Autonomy** (searches, follows links, handles dead pages) | **40** | **Phases 3, 4 & 6 Done** (Resilient crawler, link prioritization, dead-page failover, query reformulation, compiled LangGraph state machine with self-healing feedback loops). |
 | **Contact Accuracy** (real, deliverable contacts, no hallucinated data) | **30** | **Phases 4 & 5 Done** (Zero-hallucination extractor, pattern engine, DNS MX, non-intrusive SMTP handshake, catch-all detection, profile HEAD checks). |
 | **Brochure / PDF Parsing** (extracts targets from uploaded brochure) | **15** | **Phase 2 Done** (Hybrid PyMuPDF + pdfplumber + Vision OCR raster fallback). |
-| **End-to-End Pipeline** (hands-free, from query to populated sheet) | **15** | **Phases 1 & 3 Done**. Phases 7 & 8 will wire live Google Sheet sync & streaming API. |
+| **End-to-End Pipeline** (hands-free, from query to populated sheet) | **15** | **Phases 1, 3 & 6 Done**. Phases 7 & 8 will wire live Google Sheet sync & streaming API. |
 | **TOTAL** | **100** | On track for full 100/100 points. |
 
 ---
@@ -55,10 +55,10 @@ The system outputs records matching this exact 6-field schema. Any violation or 
 
 ## 4. Current Status: What Has Been Built & Tested
 
-All tasks across **Phases 0 through 5** are 100% complete with **76 automated tests passing**:
+All tasks across **Phases 0 through 6** are 100% complete with **92 automated tests passing**:
 
 ```
-============================== 76 passed in 0.77s ==============================
+============================== 92 passed in 1.39s ==============================
 ```
 
 ### Phase 0: Workspace & Dependency Isolation
@@ -143,6 +143,25 @@ All tasks across **Phases 0 through 5** are 100% complete with **76 automated te
   - Strictly enforces Zero-Hallucination mandate: unverified leads return `is_deliverable=False` or `None`.
   - `verify_decision_maker` helper generating validated 6-field `FinalLeadRecord`.
 - **`tests/test_verifier.py`**: 20 unit tests covering syntax, typo correction, MX resolution, SMTP handshakes, catch-all detection, and end-to-end verification.
+
+### Phase 6: LangGraph State Machine Assembly & Feedback Loops (`src/graph/`)
+- **`src/graph/nodes.py`**:
+  - `parse_input_node`: Ingests brochure PDF or search query; generates target seeds filtered by category focus.
+  - `expand_targets_node`: Synthesizes corporate and delegation search queries via `QueryGenerator`.
+  - `search_web_node`: Queries Google/Tavily via `UnifiedSearchClient` and ranks candidate URLs.
+  - `crawl_page_node`: Deep crawls target domains, parses markdown, extracts emails and handles dead links.
+  - `dead_link_recovery_node`: Generates dead-page pivot queries and increments retry counts without failing the run.
+  - `extract_decision_maker_node`: Extracts human decision-makers, rejecting generic mailboxes.
+  - `social_dork_search_node`: Fallback LinkedIn search when direct corporate websites contain no individual names.
+  - `verify_contact_node`: Coordinates multi-stage deliverability verification via `ContactVerifier` and advances the target queue.
+  - `sync_sheet_node`: Formats the final 6-column sheet rows and marks workflow completion.
+- **`src/graph/edges.py`**:
+  - `route_after_crawl`: Routes dead/blocked pages to `dead_link_recovery` or advances to extraction.
+  - `route_after_extraction`: Routes to `social_dork_search` if website lacks names or advances to verification.
+  - `route_after_verification`: Self-healing cyclical loop back to `expand_targets` until queue exhaustion or quota reached.
+- **`src/graph/lead_graph.py`**:
+  - Compiles master `StateGraph(AgentState)` with `MemorySaver` checkpointer for state auditability, pause/resume, and event streaming.
+- **`tests/test_graph_flow.py`**: 16 unit and integration tests covering node execution, conditional branching, dead link recovery, and full end-to-end flow.
 
 ---
 
@@ -230,31 +249,22 @@ CQ_Scraper/
 
 ## 6. What Needs to Be Done Next: Step-by-Step
 
-Phases 0 through 5 are complete and verified. The next step is **Phase 6 through Phase 10** in sequential order:
+Phases 0 through 6 are complete and verified. The next step is **Phase 7 through Phase 10** in sequential order:
 
-### NEXT STEP: Phase 6 — LangGraph State Machine Assembly & Autonomous Feedback Loops
-*(Targeting 40 Points: Agent Flow & Autonomy)*
-1. **`src/graph/nodes.py`**:
-   - Implement execution nodes: `parse_input_node`, `expand_targets_node`, `search_web_node`, `crawl_page_node`, `extract_decision_maker_node`, `verify_contact_node`, `dead_link_recovery_node`, `sync_sheet_node`.
-2. **`src/graph/edges.py`**:
-   - Implement conditional routing functions:
-     - `route_after_crawl`: Route dead/blocked URLs to `dead_link_recovery_node` (pivot query) without crashing.
-     - `route_after_extraction`: If no decision maker found, pivot to LinkedIn dork search.
-     - `route_after_verification`: If contact verified -> accumulate; if unverified -> retry pivot or advance.
-     - `check_completion`: Loop through candidate queue until quota is met.
-3. **`src/graph/lead_graph.py`**:
-   - Assemble and compile `StateGraph(AgentState)` with `MemorySaver` checkpointer for auditability and pause/resume.
-4. **`tests/test_graph_flow.py`**:
-   - Unit tests verifying graph node execution, conditional branching, dead link failover, and cycle termination.
+### NEXT STEP: Phase 7 — Hands-Free Google Sheets & Local SQLite Sync
+*(Targeting 15 Points: End-to-End Pipeline)*
+1. **`src/storage/google_sheets.py`**:
+   - Authenticate with Google Service Account credentials via `gspread`.
+   - Idempotent sheet initialization: enforce exact 6-column headers with navy styling (`#1E293B`) and frozen header row.
+   - Deduplication against existing rows (`Organization Name` and `Contact Channel`).
+   - Batch row insertion (`append_rows`) in chunks to respect Google API limits.
+   - Color code `Verification Status` cells (Green for "Verified", Amber for "Pattern-Derived").
+2. **`src/storage/database.py`**:
+   - Local SQLite database (`aiosqlite`) storing run histories, raw crawl snippets, MX records, and timestamps for offline replayability and evaluation audit.
+3. **`tests/test_storage.py`**:
+   - Unit tests mocking `gspread` client, batch insertions, duplicate prevention, and SQLite persistence.
 
 ---
-
-### Upcoming Phases Overview
-
-#### Phase 6: LangGraph State Machine Assembly & Feedback Loops
-- Wire nodes (`parse_input_node`, `expand_targets_node`, `search_web_node`, `crawl_page_node`, `extract_decision_maker_node`, `verify_contact_node`, `dead_link_recovery_node`, `sync_sheet_node`) into a compiled `StateGraph`.
-- Implement conditional edges (`route_after_crawl`, `route_after_verification`, `check_completion`).
-- Attach `MemorySaver` checkpointer for state persistence.
 
 #### Phase 7: Hands-Free Google Sheets & Local SQLite Sync
 - **`src/storage/google_sheets.py`**: Google Service Account authentication via `gspread`, automatic header creation with navy styling (`#1E293B`), deduplication against existing rows, and batch cell insertion (`append_rows`).

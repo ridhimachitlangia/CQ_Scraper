@@ -46,6 +46,8 @@ class AgentState(TypedDict, total=False):
     retry_count: int
     max_retries: int
     is_complete: bool
+    current_page_dead: bool
+    needs_social_dork: bool
 
     # --- Export & External Sync ---
     google_sheet_url: Optional[str]
@@ -84,6 +86,8 @@ def create_initial_state(
         retry_count=0,
         max_retries=max_retries,
         is_complete=False,
+        current_page_dead=False,
+        needs_social_dork=False,
         google_sheet_url=None,
         rows_synced_count=0,
         audit_logs=[],
